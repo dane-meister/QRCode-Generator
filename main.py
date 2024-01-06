@@ -17,7 +17,7 @@ def generate_qr_code(link):
     qr.add_data(link)
     qr.make(fit=True)
     img = qr.make_image(fill="black", back_color="white")
-    img.save("test.png")
+    img.save("qrcode.png")
     print("QR Code generated in test.png")
 
 
