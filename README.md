@@ -24,8 +24,8 @@ This project is a Python application that allows users to generate and decode QR
 - pip (Python package installer)
 ## Steps:
 ### 1: Clone the Repository
-git clone https://github.com/dane-meister/QRCode-Generator.git <br>
-cd QRCode-Generator
+$ git clone https://github.com/dane-meister/QRCode-Generator.git <br>
+$ cd QRCode-Generator
 ### 2: Install Required Python Libraries
 $ pip install qrcode[pil] <br>
 $ pip install opencv-python <br>
