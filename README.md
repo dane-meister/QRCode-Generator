@@ -11,11 +11,11 @@ This project is a Python application that allows users to generate and decode QR
 - Decode and display information from QR codes.
 
 ### Technologies Used
-Python: The main programming language used for developing the application.
-Tkinter: A standard Python library for creating GUI applications.
-OpenCV (cv2): Used for decoding QR codes from saved images.
-qrcode: A Python library for generating QR codes.
-Pillow (PIL): A Python Imaging Library used for handling and manipulating image files.
+- Python: The main programming language used for developing the application.
+- Tkinter: A standard Python library for creating GUI applications.
+- OpenCV (cv2): Used for decoding QR codes from saved images.
+- qrcode: A Python library for generating QR codes.
+- Pillow (PIL): A Python Imaging Library used for handling and manipulating image files.
 
 ## Installation 
 
@@ -24,15 +24,15 @@ Pillow (PIL): A Python Imaging Library used for handling and manipulating image 
 - pip (Python package installer)
 ## Steps:
 ### 1: Clone the Repository
-git clone https://github.com/dane-meister/qr-code-generator-decoder.git
+git clone https://github.com/dane-meister/qr-code-generator-decoder.git <br>
 cd qr-code-generator-decoder
 ### 2: Install Required Python Libraries
-pip install qrcode[pil]
-pip install opencv-python
+pip install qrcode[pil] <br>
+pip install opencv-python <br>
 pip install pillow
 
 ## Running the Application
-To run the application, navigate to the cloned directory and execute the main Python script:
+To run the application, navigate to the cloned directory and execute the main Python script: <br>
 python main.py
 
 #### License 
