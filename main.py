@@ -1,13 +1,13 @@
 import qrcode
-import image
-from qrcode.image.styledpil import StyledPilImage
-from qrcode.image.styles.moduledrawers.pil import RoundedModuleDrawer
-from qrcode.image.styles.colormasks import RadialGradiantColorMask
+import tkinter as tk
 import cv2
-import numpy as np
 from pyzbar.pyzbar import decode
+from tkinter import filedialog, messagebox
+from PIL import Image, ImageTk
 
+qr_displayed = False
 
+# Default QR Code
 qr = qrcode.QRCode(
     version=None,  # version of qr code
     error_correction=qrcode.constants.ERROR_CORRECT_H,  # error correction (<=30% = H)
@@ -16,98 +16,151 @@ qr = qrcode.QRCode(
 )
 
 
-def main():
-    print("Hello! Welcome to my QR Code generator. " +
-          "Before using make sure you have run the 'pip install qrcode' command.")
-    done = -1
-    while done == -1:
-        done = settings()
-    generate_qr_code(input("Input link or text to generate QR Code: "))
-    # Decodes qr code for error checking
-    decode_qr()
+# Validates if input is a digit
+def validate_input(P):
+    if P == "" or P.isdigit():
+        return True
+    messagebox.showerror("Type Error", "Please input a number in the specified range!")
+    return False
 
 
-def settings():
-    settings_input = input("Would you like to enable default generation settings? (Y/N): ")
-    settings_input.upper()
-    if settings_input == 'Y':
-        create_qr_specs(None, 10, 4)
-        return 0
-    elif settings_input == 'N':
-        print("The version parameter is an integer from 1 to 40 that controls the size of the" +
-              "QR Code (the smallest, version 1, is a 21x21 matrix). Set to 0 to determine this automatically.")
-        try:
-            version = int(input("Input version number [0-40]: "))
-            if version > 40 or version < 0:
-                print("Please input valid version number as specified.\n")
-                return -1
-        except ValueError:
-            print("That's not a valid number. Please enter a numeric value.\n")
-            return -1
+# Initialize the main window
+root = tk.Tk()
+root.title("QR Code Generator and Decoder")
 
-        print("The box size parameter controls how many pixels each “box” of the QR code is.")
-        try:
-            box_size = int(input("Input desired box size (recommended 10): "))
-            if box_size < 0 or box_size > 150:
-                print("Please input valid box_size number as specified.\n")
-                return -1
-        except ValueError:
-            print("That's not a valid number. Please enter a numeric value.\n")
-            return -1
+# Input field for text or link
+tk.Label(root, text="Input Text or Link:").pack()
+text_input = tk.Text(root, height=2, width=50)
+text_input.pack()
 
-        print("The border parameter controls how many boxes thick the border should be" +
-              " (the default is 4, which is the minimum according to the specs).")
-        try:
-            border = int(input("Input desired border size (>=4): "))
-            if border < 4:
-                print("Please input valid border size as specified.\n")
-                return -1
-        except ValueError:
-            print("That's not a valid number. Please enter a numeric value.\n")
-            return -1
+# Create a Scrollbar and set its command to the text widget's yview
+scrollbar = tk.Scrollbar(root, command=text_input.yview)
+scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
 
-        create_qr_specs(version, box_size, border)
-        return 0
-    else:
-        print("Please input either Y or N.\n")
-        return -1
+# Configure the text widget to update the scrollbar
+text_input.config(yscrollcommand=scrollbar.set)
+
+# Spinbox for version, box size, and border
+version = tk.IntVar(value=0)
+box_size = tk.IntVar(value=10)
+border = tk.IntVar(value=4)
+
+vcmd = (root.register(validate_input), '%P')
+
+tk.Label(root, text="QR Version (1-40), or 0 for automatic:").pack()
+version_spinbox = tk.Spinbox(root, from_=0, to=40, textvariable=version, validate="key", validatecommand=vcmd)
+version_spinbox.pack()
 
 
-def create_qr_specs(version, box_size, border):
+tk.Label(root, text="Box Size (1-50):").pack()
+box_size_spinbox = tk.Spinbox(root, from_=1, to=50, textvariable=box_size, validate="key", validatecommand=vcmd)
+box_size_spinbox.pack()
+
+tk.Label(root, text="Border Size (1-10):").pack()
+border_spinbox = tk.Spinbox(root, from_=1, to=10, textvariable=border, validate="key", validatecommand=vcmd)
+border_spinbox.pack()
+
+
+# Function to update QR code specifications
+def create_qr_specs(cust_version, cust_box_size, cust_border):
     global qr
     qr = qrcode.QRCode(
-        version=version,  # version of qr code
-        error_correction=qrcode.constants.ERROR_CORRECT_H,  # error correction (<=30% = H)
-        box_size=box_size,  # size of box qr code displayed on
-        border=border,  # white border
+        version=cust_version,
+        error_correction=qrcode.constants.ERROR_CORRECT_H,
+        box_size=cust_box_size,
+        border=cust_border,
     )
 
 
-def generate_qr_code(link):
+# Function to generate QR code
+def generate_qr_code():
+    # Validation for version, box size, and border
+    version_val = version.get()
+    box_size_val = box_size.get()
+    border_val = border.get()
+
+    if not (0 <= version_val <= 40):
+        messagebox.showerror("Input Error", "Version must be a number between 0 and 40.")
+        return
+    if not (1 <= box_size_val <= 50):
+        messagebox.showerror("Input Error", "Box Size must be a number between 1 and 50.")
+        return
+    if not (1 <= border_val <= 10):
+        messagebox.showerror("Input Error", "Border must be a number between 1 and 10.")
+        return
+
+    link = text_input.get("1.0", "end-1c")  # Get input from text box, from line 1 char 1 to end - 1 char
+    version_ref = version.get()
+    if version_ref == 0:
+        create_qr_specs(None, box_size.get(), border.get())  # Auto version Update QR specs from user input
+    else:
+        create_qr_specs(version.get(), box_size.get(), border.get())  # Update QR specs from user input
     qr.add_data(link)
     qr.make(fit=True)
-    img = qr.make_image(fill="black", back_color="white")  # basic qr code image
+    img = qr.make_image(fill='black', back_color='white').convert('RGB')
 
-    # experimental custom qr codes
-    # img = qr.make_image(image_factory=StyledPilImage, module_drawer=RoundedModuleDrawer())
-    # img = qr.make_image(image_factory=StyledPilImage, color_mask=RadialGradiantColorMask())
-    # img = qr.make_image(image_factory=StyledPilImage, embeded_image_path="./meme.png")
-
+    # Save the QR code to a file
     img.save("qrcode.png")
-    print("\nQR Code generated in 'qrcode.png'!")
+
+    # Resize the QR Code to fit the UI
+    qr_image = Image.open("qrcode.png")
+    qr_image = qr_image.resize((250, 250))
+    qr_photo = ImageTk.PhotoImage(qr_image)
+
+    # Update the UI with the QR code image
+    qr_label.config(image=qr_photo)
+    qr_label.image = qr_photo  # Keep a reference!
+    qr_label.pack()
+    global qr_displayed
+    if qr_displayed is False:
+        save_button.pack(before=decode_button)
+    qr_displayed = True
+    decode_qr(clear=1)
 
 
-def decode_qr():
-    # Load the image using OpenCV
-    img = cv2.imread('./qrcode.png')
-
-    # Decode the QR code
-    data = decode(img)
-
-    # Extract the message from the QR code if available
-    qr_code_message = data[0].data.decode() if data else "\nNo QR code found.\n"
-    print(f"QR Code Decoder -> The message encoded in this qr code is '{qr_code_message}'.")
+# Button to generate QR code
+generate_button = tk.Button(root, text="Generate QR Code", command=generate_qr_code)
+generate_button.pack()
 
 
-if __name__ == '__main__':
-    main()
+# Function to save the QR code image
+def save_qr():
+    file_path = filedialog.asksaveasfilename(defaultextension='.png',
+                                             filetypes=[("PNG files", '*.png'), ("All Files", '*.*')],
+                                             title="Save QR Code")
+    if file_path:
+        qr_image = Image.open("qrcode.png")
+        qr_image.save(file_path)
+        messagebox.showinfo("Save QR Code", "QR Code saved successfully!")
+
+
+# Button to save the QR code image
+save_button = tk.Button(root, text="Save QR Code", command=save_qr)
+
+# Label to display the generated QR code
+qr_label = tk.Label(root)
+qr_label.pack()
+
+
+# Function to decode QR code
+def decode_qr(clear=0):
+    if clear != 0:
+        decode_label.config(text=f"Decoded Message: ")
+    else:
+        img = cv2.imread('qrcode.png')
+        data = decode(img)
+        qr_code_message = data[0].data.decode() if data else "No QR code found."
+        decode_label.config(text=f"Decoded Message: {qr_code_message}")
+
+
+# Button to decode QR code
+decode_button = tk.Button(root, text="Decode QR Code", command=decode_qr)
+decode_button.pack()
+
+# Label to display the decoded message
+decode_label = tk.Label(root, text="Decoded Message: ", wraplength=300)
+decode_label.pack()
+
+
+# Start the GUI event loop
+root.mainloop()
