@@ -1,14 +1,41 @@
-# QRCode Generator
- Python program that can turn a link into a QRCode. 
+# QR CODE GENERATOR AND DECODER
 
-## Steps for Running:
+## PROJECT OVERVIEW 
+This project is a Python application that allows users to generate and decode QR codes. It provides a simple graphical user interface (GUI) where users can input text or links to generate QR codes. Additionally, the application can decode QR codes and display the encoded information. This tool is useful for creating QR codes for websites, Wi-Fi passwords, contact information, and other text-based data (AKA super top-secret messages shhh).
 
-Install the following through command line:
-pip install qrcode
-pip install image
-pip install pyzbar
-pip install numpy 
+### Features
+- Generate QR codes from text or URL input.
+- Set custom parameters for QR codes such as version, box size, and border size.
+- Display generated QR codes within the application window.
+- Save generated QR codes as PNG files.
+- Decode and display information from QR codes.
+
+### Technologies Used
+Python: The main programming language used for developing the application.
+Tkinter: A standard Python library for creating GUI applications.
+OpenCV (cv2): Used for decoding QR codes from saved images.
+qrcode: A Python library for generating QR codes.
+Pillow (PIL): A Python Imaging Library used for handling and manipulating image files.
+
+## Installation 
+
+#### Prerequisites 
+- Python 3.x
+- pip (Python package installer)
+## Steps:
+### 1: Clone the Repository
+git clone https://github.com/dane-meister/qr-code-generator-decoder.git
+cd qr-code-generator-decoder
+### 2: Install Required Python Libraries
+pip install qrcode[pil]
 pip install opencv-python
+pip install pillow
 
-The program will prompt you to enter a link, the outputted QRCode that is generated will be in a file in the current directory labeled "qrcode.png".
-You will also have the option to customize the QR Code that is outputted by some parameters.
+## Running the Application
+To run the application, navigate to the cloned directory and execute the main Python script:
+python main.py
+
+#### License 
+This project is licensed under the MIT License.
+
+
